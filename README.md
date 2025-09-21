@@ -60,7 +60,7 @@
 
 ## 📁 Project Structure
 
-\`\`\`
+```
 justmarketing_aws_greathack/
 ├── app/                          # Next.js App Router
 │   ├── layout.tsx               # Root layout component
@@ -93,7 +93,7 @@ justmarketing_aws_greathack/
 ├── package.json                 # Dependencies
 ├── next.config.mjs             # Next.js configuration
 └── tsconfig.json               # TypeScript configuration
-\`\`\`
+```
 
 ## 🚀 Getting Started
 
