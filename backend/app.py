@@ -60,6 +60,12 @@ app = FastAPI(
     version="1.1.0"
 )
 
+# Ensure Images folder exists
+os.makedirs("Images", exist_ok=True)
+
+# Serve Images folder at /images
+app.mount("/images", StaticFiles(directory="Images"), name="images")
+
 # Add CORS middleware to allow frontend connections
 app.add_middleware(
     CORSMiddleware,

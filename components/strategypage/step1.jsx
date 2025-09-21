@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Target } from "lucide-react"
 
 const malaysianStates = [
+  "All States in Malaysia",
   "Kuala Lumpur",
   "Selangor",
   "Penang",
@@ -135,15 +136,15 @@ export function StepOne({ formData, setFormData, onNext }) {
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1 week">1 week</SelectItem>
-                <SelectItem value="2 weeks">2 weeks</SelectItem>
-                <SelectItem value="3 weeks">3 weeks</SelectItem>
-                <SelectItem value="4 weeks">4 weeks</SelectItem>
-                <SelectItem value="6 weeks">6 weeks</SelectItem>
-                <SelectItem value="8 weeks">8 weeks</SelectItem>
-                <SelectItem value="3 months">3 months</SelectItem>
-                <SelectItem value="6 months">6 months</SelectItem>
-              </SelectContent>
+    <SelectItem value="1">1 week</SelectItem>
+    <SelectItem value="2">2 weeks</SelectItem>
+    <SelectItem value="3">3 weeks</SelectItem>
+    <SelectItem value="4">4 weeks</SelectItem>
+    <SelectItem value="6">6 weeks</SelectItem>
+    <SelectItem value="8">8 weeks</SelectItem>
+    <SelectItem value="12">3 months</SelectItem>
+    <SelectItem value="24">6 months</SelectItem>
+  </SelectContent>
             </Select>
           </div>
         </div>
