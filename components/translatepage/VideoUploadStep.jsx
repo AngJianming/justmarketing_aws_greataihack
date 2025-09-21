@@ -18,11 +18,12 @@ export function VideoUploadStep({ onTranslationComplete}) {
   const videoRef = useRef(null)
 
   const languages = [
-    { value: "english", label: "English", flag: "🇺🇸" },
-    { value: "malay", label: "Bahasa Malaysia", flag: "🇲🇾" },
-    { value: "chinese", label: "中文 (Chinese)", flag: "🇨🇳" },
-    { value: "tamil", label: "தமிழ் (Tamil)", flag: "🇮🇳" },
-  ]
+    { value: "en", label: "English", flag: "🇺🇸" },
+    { value: "es", label: "Spanish", flag: "🇪🇸" },
+    { value: "zh", label: "中文 (Mandarin)", flag: "🇨🇳" },
+    { value: "zh-HK", label: "廣東話 (Cantonese)", flag: "🇭🇰" },
+  ];
+
 
   const handleFileSelect = (event) => {
     const file = event.target.files?.[0]
@@ -65,24 +66,56 @@ export function VideoUploadStep({ onTranslationComplete}) {
 
     await new Promise((resolve) => setTimeout(resolve, 3000))
 
-    // Mock translation result with Malaysian context
-    const mockWordsToNotice = [
-      "Brand name pronunciation in local dialect",
-      'Cultural context for "family values" in Malaysian society',
-      "Local pricing format (RM currency)",
-      "Regional product availability across Malaysia",
-      "Halal certification requirements mention",
-    ]
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("target_lang", selectedLanguage);
 
-    onTranslationComplete({
-      originalVideo: videoUrl,
-      translatedVideo: videoUrl, // In real app, this would be the translated video
-      targetLanguage: selectedLanguage,
-      wordsToNotice: mockWordsToNotice,
-    })
+    try {
+      const response = await fetch("http://127.0.0.1:8000/localize", {
+        method: "POST",
+        body: formData,
+      });
 
-    setIsTranslating(false)
-  }
+      if (!response.ok) {
+        throw new Error("Localization failed");
+      }
+
+      const jobData = await response.json();
+      // Assume jobData has { job_id: "..." }
+      const video_id = jobData.video_id;
+      if (!video_id) throw new Error("No video ID returned from API");
+
+      // Poll for status
+      let status = "in_progress";
+      let result = null;
+      while (status !== "completed") {
+        await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait 3 seconds between polls
+
+        const statusRes = await fetch(`http://127.0.0.1:8000/localize/status/${video_id}`);
+        if (!statusRes.ok) throw new Error("Failed to get job status");
+
+        const statusData = await statusRes.json();
+        status = statusData.status;
+        if (status === "completed") {
+          result = statusData.result;
+        }
+      }
+
+
+      onTranslationComplete({
+        originalVideo: videoUrl,
+        translatedVideo: result.video_uri, // In real app, this would be the translated video
+        targetLanguage: selectedLanguage,
+        transcript: result.transcript,
+        translation: result.translation,
+        translationAnalysis: result.translation_analysis,
+      })
+    } catch (error) {
+      alert("Error: " + error.message)
+    } finally {
+      setIsTranslating(false)
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -240,3 +273,4 @@ export function VideoUploadStep({ onTranslationComplete}) {
     </div>
   )
 }
+

@@ -14,17 +14,11 @@ def test_connection():
     
     try:
         response = requests.get(f"{BASE_URL}/testing")
-        if response.status_code == 200:
-            print("✅ API connection successful!")
-            print(json.dumps(response.json(), indent=2))
-            return True
-        else:
-            print(f"❌ API connection failed: {response.status_code}")
-            print(response.text)
-            return False
+        print(response.json())
+        return response.json()
     except Exception as e:
         print(f"❌ Connection error: {str(e)}")
-        return False
+        return None
 
 def test_health_check():
     """Test the health check endpoint"""
@@ -32,18 +26,11 @@ def test_health_check():
     
     try:
         response = requests.get(f"{BASE_URL}/health")
-        if response.status_code == 200:
-            result = response.json()
-            print(f"✅ Health check successful: {result['status']}")
-            print(json.dumps(result, indent=2))
-            return True
-        else:
-            print(f"❌ Health check failed: {response.status_code}")
-            print(response.text)
-            return False
+        print(response.json())
+        return response.json()
     except Exception as e:
         print(f"❌ Health check error: {str(e)}")
-        return False
+        return None
 
 def test_text_analysis(text_content):
     """Test the text analysis endpoint"""
@@ -62,35 +49,11 @@ def test_text_analysis(text_content):
             json=payload,
             headers={"Content-Type": "application/json"}
         )
-        
-        if response.status_code == 200:
-            result = response.json()
-            print("✅ Text analysis successful!")
-            print(f"Success: {result['success']}")
-            
-            if result['success']:
-                print("📊 Analysis Results:")
-                print(json.dumps(result['analysis_result'], indent=2))
-                if result.get('logs'):
-                    print("📋 Processing logs:")
-                    for log in result['logs']:
-                        print(f"  - {log}")
-            else:
-                print(f"❌ Analysis failed: {result.get('error', 'Unknown error')}")
-                if result.get('logs'):
-                    print("📋 Error logs:")
-                    for log in result['logs']:
-                        print(f"  - {log}")
-            
-            return result['success']
-        else:
-            print(f"❌ Request failed: {response.status_code}")
-            print(response.text)
-            return False
-            
+        print(response.json())
+        return response.json()
     except Exception as e:
         print(f"❌ Text analysis error: {str(e)}")
-        return False
+        return None
 
 def test_image_analysis(image_file_path):
     """Test the image analysis endpoint with an image file"""
@@ -119,40 +82,14 @@ def test_image_analysis(image_file_path):
             json=payload,
             headers={"Content-Type": "application/json"}
         )
-        
-        if response.status_code == 200:
-            result = response.json()
-            print("✅ Image analysis successful!")
-            print(f"Success: {result['success']}")
-            
-            if result['success']:
-                print("🖼️  Image Description:")
-                print(result.get('image_description', 'No description available'))
-                print("📊 Analysis Results:")
-                print(json.dumps(result['analysis_result'], indent=2))
-                if result.get('logs'):
-                    print("📋 Processing logs:")
-                    for log in result['logs']:
-                        print(f"  - {log}")
-            else:
-                print(f"❌ Analysis failed: {result.get('error', 'Unknown error')}")
-                if result.get('logs'):
-                    print("📋 Error logs:")
-                    for log in result['logs']:
-                        print(f"  - {log}")
-            
-            return result['success']
-        else:
-            print(f"❌ Request failed: {response.status_code}")
-            print(response.text)
-            return False
-            
+        print(response.json())
+        return response.json()
     except FileNotFoundError:
         print(f"❌ Image file not found: {image_file_path}")
-        return False
+        return None
     except Exception as e:
         print(f"❌ Image analysis error: {str(e)}")
-        return False
+        return None
 
 def test_speech_to_text(video_file_path, use_bedrock=False):
     """Test the speech-to-text endpoint with a video file"""
@@ -179,37 +116,14 @@ def test_speech_to_text(video_file_path, use_bedrock=False):
             json=payload,
             headers={"Content-Type": "application/json"}
         )
-        
-        if response.status_code == 200:
-            result = response.json()
-            print("✅ Speech-to-text request completed!")
-            print(f"Success: {result['success']}")
-            if result['success']:
-                print(f"📝 Transcribed text: {result.get('text', 'No text')}")
-                if result.get('language_info'):
-                    print(f"🌍 Language info: {result.get('language_info')}")
-                # Display Bedrock analysis if available
-                if result.get('bedrock_analysis'):
-                    analysis = result['bedrock_analysis']
-                    print("\n🔍 BEDROCK ANALYSIS RESULTS:")
-                    print(json.dumps(analysis, indent=2))
-            else:
-                print(f"❌ Speech-to-text failed: {result.get('error', 'Unknown error')}")
-            return result['success']
-        else:
-            print(f"❌ Request failed: {response.status_code}")
-            print(response.text)
-            return False
-            
+        print(response.json())
+        return response.json()
     except FileNotFoundError:
         print(f"❌ Video file not found: {video_file_path}")
-        return False
+        return None
     except Exception as e:
         print(f"❌ Speech-to-text error: {str(e)}")
-        return False
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
-        return False
+        return None
 
 def main():
     """Main test function"""
