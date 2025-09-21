@@ -14,23 +14,49 @@ import {
   MessageCircle,
   RefreshCw,
   Star,
+  BookText,
   Clock,
   Award,
 } from "lucide-react"
 import Link from "next/link"
 
-
 export function TranslationResultsStep({ data, onBackToUpload }) {
-  const [isPlaying, setIsPlaying] = useState(false)
+  if (!data) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <p className="text-muted-foreground">Loading translation results...</p>
+      </div>
+    )
+  }
+
+  /**
+   * Converts an S3 URI (s3://bucket/key) to a public HTTPS URL.
+   * NOTE: This only works if the S3 objects are publicly accessible.
+   * The recommended production approach is for the backend to provide a pre-signed URL.
+   * @param {string} s3Uri The S3 URI.
+   * @returns {string} The HTTPS URL.
+   */
+  const convertS3UriToHttpsUrl = (s3Uri) => {
+    if (!s3Uri || !s3Uri.startsWith("s3://")) {
+      return s3Uri; // Return as-is if not a valid S3 URI or already a URL
+    }
+    const bucketAndKey = s3Uri.substring(5);
+    const [bucket, ...keyParts] = bucketAndKey.split("/");
+    const key = keyParts.join("/");
+    const region = "us-east-1"; // This should match your S3 bucket's region from app.py
+    return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
+  };
+
+  const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef(null)
 
   const languageLabels = {
-    english: "English",
-    malay: "Bahasa Malaysia",
-    chinese: "中文 (Chinese)",
-    tamil: "தமிழ் (Tamil)",
-  }
-
+    en: "English",
+    es: "Spanish",
+    zh: "中文 (Mandarin)",
+    "zh-HK": "廣東話 (Cantonese)",
+  };
+  
   const localTranslators = [
     {
       name: "Ahmad Rahman",
@@ -79,14 +105,23 @@ export function TranslationResultsStep({ data, onBackToUpload }) {
   }
 
   const handleContactTranslator = (translatorName) => {
-    // In a real app, this would open a contact modal or redirect to messaging
     alert(`Contacting ${translatorName}...`)
   }
 
-  const TranslatorCard = ({
-    translator,
-    onContact,
-  }) => {
+  const handleDownload = () => {
+    const url = convertS3UriToHttpsUrl(data.translatedVideo);
+    if (url) {
+      const link = document.createElement("a");
+      link.href = url;
+      const fileName = url.substring(url.lastIndexOf('/') + 1);
+      link.setAttribute("download", fileName || "translated-video.mp4");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    }
+  };
+
+  const TranslatorCard = ({ translator, onContact }) => {
     return (
       <Card className="hover:shadow-md transition-shadow">
         <CardContent className="p-4">
@@ -169,7 +204,7 @@ export function TranslationResultsStep({ data, onBackToUpload }) {
               <div className="h-6 w-px bg-border" />
               <div>
                 <h1 className="text-xl font-semibold text-foreground">Translation Complete</h1>
-                <p className="text-sm text-muted-foreground">Translated to {languageLabels[data.targetLanguage]}</p>
+                <p className="text-sm text-muted-foreground">Translated to {languageLabels[data.targetLanguage] || data.targetLanguage}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -190,14 +225,14 @@ export function TranslationResultsStep({ data, onBackToUpload }) {
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>Translated Video</span>
-                  <Badge variant="outline">{languageLabels[data.targetLanguage]}</Badge>
+                  <Badge variant="outline">{languageLabels[data.targetLanguage] || data.targetLanguage}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="relative rounded-lg overflow-hidden bg-black mb-4">
                   <video
                     ref={videoRef}
-                    src={data.translatedVideo}
+                    src={convertS3UriToHttpsUrl(data.translatedVideo)}
                     className="w-full h-64 object-cover"
                     onPlay={() => setIsPlaying(true)}
                     onPause={() => setIsPlaying(false)}
@@ -211,7 +246,7 @@ export function TranslationResultsStep({ data, onBackToUpload }) {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button className="flex-1" size="sm">
+                  <Button className="flex-1" size="sm" onClick={handleDownload}>
                     <Download className="w-4 h-4 mr-2" />
                     Download
                   </Button>
@@ -219,48 +254,34 @@ export function TranslationResultsStep({ data, onBackToUpload }) {
                     <Share2 className="w-4 h-4 mr-2" />
                     Share
                   </Button>
-               
                   <Button variant="outline" size="sm">
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Re-translate
                   </Button>
-                  
                 </div>
               </CardContent>
             </Card>
 
-            {/* Translation Quality Metrics */}
+            {/* Transcript & Translation */}
             <Card>
               <CardHeader>
-                <CardTitle>Translation Quality</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <BookText className="w-5 h-5" />
+                  Transcript & Translation
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Accuracy Score</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="w-[92%] h-full bg-green-500 rounded-full" />
-                      </div>
-                      <span className="text-sm font-medium">92%</span>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold mb-2 text-foreground">Original Transcript</h3>
+                    <div className="p-3 rounded-md bg-muted/50 max-h-48 overflow-y-auto">
+                      <p className="text-sm text-muted-foreground">{data.transcript}</p>
                     </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Cultural Adaptation</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="w-[88%] h-full bg-blue-500 rounded-full" />
-                      </div>
-                      <span className="text-sm font-medium">88%</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Lip Sync Quality</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="w-[85%] h-full bg-orange-500 rounded-full" />
-                      </div>
-                      <span className="text-sm font-medium">85%</span>
+                  <div>
+                    <h3 className="font-semibold mb-2 text-foreground">AI Translation</h3>
+                    <div className="p-3 rounded-md bg-muted/50 max-h-48 overflow-y-auto">
+                      <p className="text-sm text-muted-foreground">{data.translation}</p>
                     </div>
                   </div>
                 </div>
@@ -268,37 +289,52 @@ export function TranslationResultsStep({ data, onBackToUpload }) {
             </Card>
           </div>
 
-          {/* Right Column - Words to Notice & Translators */}
+          {/* Right Column - Translation Analysis & Translators */}
           <div className="space-y-6">
-            {/* Words to be Noticed Card */}
+            {/* Translation Analysis Card */}
             <Card className="border-orange-200 bg-orange-50/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-orange-800">
                   <AlertTriangle className="w-5 h-5" />
-                  Words to be Noticed
+                  Translation Analysis
                 </CardTitle>
                 <p className="text-sm text-orange-700">
                   These elements may need attention from local translators for better cultural adaptation
                 </p>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {data.wordsToNotice.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-3 p-3 bg-white rounded-lg border border-orange-200"
-                    >
-                      <div className="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
-                        {index + 1}
+                <div className="space-y-4">
+                  {data.translationAnalysis?.potential_issues?.length > 0 ? (
+                    data.translationAnalysis.potential_issues.map((issue, index) => (
+                      <div key={index} className="p-3 bg-white rounded-lg border border-orange-200">
+                        <Badge variant="secondary" className="mb-2">
+                          {issue.category}
+                        </Badge>
+                        <div className="space-y-2 text-sm">
+                          <p>
+                            <strong className="text-foreground">Original:</strong>{" "}
+                            <span className="text-muted-foreground">{issue.original_phrase}</span>
+                          </p>
+                          <p>
+                            <strong className="text-foreground">Translation:</strong>{" "}
+                            <span className="text-muted-foreground">{issue.translated_phrase}</span>
+                          </p>
+                          <p className="pt-1 text-xs text-orange-900">
+                            <strong>Explanation:</strong> {issue.explanation}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-sm text-foreground">{item}</p>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center p-4">
+                      No potential issues were detected.
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Local Translators Card */}
+            {/* Local Translators */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
