@@ -106,7 +106,7 @@ export function StepFive({ formData, insightData, onPrevious }) {
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => handleExport("Print")}>
+        <Card className="hover:shadow-lg transition-shadow cursor-pointer"  onClick={() => window.print()}>
           <CardContent className="p-6 text-center">
             <Printer className="h-8 w-8 text-accent mx-auto mb-3" />
             <h3 className="font-medium mb-2">Print Version</h3>

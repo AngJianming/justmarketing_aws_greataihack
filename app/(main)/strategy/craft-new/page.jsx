@@ -29,32 +29,69 @@ export function MarketingStrategyCrafter() {
   const stepTitles = ["Campaign Foundation", "AI Insights", "Visual Design", "Timeline", "Export"]
 
   const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1)
-    }
+    if (currentStep < totalSteps) setCurrentStep(currentStep + 1)
   }
 
   const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
-    }
+    if (currentStep > 1) setCurrentStep(currentStep - 1)
+  }
+
+  // Helper function to extract sections from campaign_plan
+  const extractSection = (text, keyword) => {
+    const regex = new RegExp(`${keyword}:\\s*([^\\n]+)`, "i")
+    const match = text.match(regex)
+    return match ? match[1].trim() : ""
   }
 
   const handleGenerateInsights = async () => {
     setIsGenerating(true)
-    // Simulate AI processing
-    await new Promise((resolve) => setTimeout(resolve, 3000))
 
-    // Mock AI-generated insights based on form data
-    const mockInsights= {
-      hashtags: ["#OOTD", "#OnzLah", "#CunLook", "#MalaysiaStyle", "#TrendingMY"],
-      contentType: "Short TikTok challenge + IG Story stickers",
-      tone: "Fun, playful, pastel",
-      strategy: `Target ${formData.targetedCulture.join(" & ")} communities in ${formData.region} with ${formData.goal.toLowerCase()} focused campaigns during ${formData.seasonality.join(" & ")} seasons.`,
+    try {
+      const payload = {
+        product: formData.product,
+        target_region: formData.region,
+        target_culture: formData.targetedCulture,
+        target_audience: formData.audience,
+        campaign_goal: formData.goal,
+        campaign_duration: parseInt(formData.duration, 10) || 4,
+        seasonality: formData.seasonality,
+        budget_range: formData.budget,
+      }
+
+      const response = await fetch("http://127.0.0.1:8000/generate-campaign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) throw new Error(`API Error: ${response.status}`)
+
+      const data = await response.json()
+      console.log("API result:", data)
+
+      // ✅ Transform backend response for frontend
+      const insights = {
+        hashtags: extractSection(data.campaign_plan, "Hashtags")
+          ? extractSection(data.campaign_plan, "Hashtags").split(",").map(h => h.trim())
+          : [],
+        contentType: extractSection(data.campaign_plan, "Content Types")
+          ? extractSection(data.campaign_plan, "Content Types").split(",").map(c => c.trim())
+          : [],
+        tone: extractSection(data.campaign_plan, "Poster/Video Tone") || "",
+        strategy: extractSection(data.campaign_plan, "Strategy") || "",
+        visualElements: data.visual_elements || [],
+        campaignDoc: data.campaign_document_path || null,
+      }
+
+      console.log("Frontend insightData:", insights)
+
+      setInsightData(insights)
+    } catch (error) {
+      console.error("Error generating campaign:", error)
+      alert("Failed to generate campaign. Check backend logs.")
+    } finally {
+      setIsGenerating(false)
     }
-
-    setInsightData(mockInsights)
-    setIsGenerating(false)
   }
 
   const renderStep = () => {
@@ -89,7 +126,7 @@ export function MarketingStrategyCrafter() {
 
   return (
     <div className="marketing-strategy-bg min-h-screen pt-16 pb-4">
-      <div className="container mx-auto py-8 max-w-6xl px-5 ">
+      <div className="container mx-auto py-8 max-w-6xl px-5">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
@@ -101,7 +138,7 @@ export function MarketingStrategyCrafter() {
             </h1>
           </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {"Create data-driven marketing strategies tailored for Malaysian audiences with AI-powered insights"}
+            Create data-driven marketing strategies tailored for Malaysian audiences with AI-powered insights
           </p>
         </div>
 
@@ -116,4 +153,3 @@ export function MarketingStrategyCrafter() {
 }
 
 export default MarketingStrategyCrafter
-
