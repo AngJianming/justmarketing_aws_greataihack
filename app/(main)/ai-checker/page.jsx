@@ -39,86 +39,30 @@ export default function AIChecker() {
   const [uploadedFile, setUploadedFile] = useState(null)
   const fileInputRef = useRef(null)
 
-  const languages = ["Malay", "Chinese", "Tamil", "English"]
+  const languages = ["Malaysia", "Chinese", "Tamil", "English"]
 
   const regions = ["West Malaysia", "East Malaysia", "Singapore", "Indonesia", "Thailand", "Philippines"]
 
   const races = ["Malay", "Chinese", "Indian", "Mixed"]
 
-  const handleFileUpload = async (event) => {
+  const handleFileUpload = (event) => {
     const file = event.target.files?.[0]
     if (!file) return
 
     setUploadedFile(file)
-    setIsAnalyzing(true)
-    setBedrockStatus("PROCESSING")
+    setContent("") // Clear any pasted text to avoid confusion
+    setAnalysisResult(null)
+    setBedrockStatus(null)
+    // Do not switch tabs, stay on 'import'
 
-    // Read file as Base64
-    const reader = new FileReader()
-    reader.onload = async (e) => {
-      const base64Data = e.target?.result
-
-      try {
-        let response
-        let apiResult
-
-        if (file.type.startsWith("video/")) {
-          // Call FastAPI Speech-to-Text
-          response = await fetch("http://127.0.0.1:8000/speech-to-text", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              video_base64: base64Data,
-              filename: file.name,
-            }),
-          })
-          apiResult = await response.json()
-
-          if (apiResult.success && apiResult.text) {
-            setContent(apiResult.text)
-          }
-        } else if (file.type.startsWith("image/")) {
-          // Call FastAPI Image Analysis
-          response = await fetch("http://127.0.0.1:8000/image-analysis", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              image_base64: base64Data,
-              image_format: file.type.split("/")[1], // e.g., "jpeg", "png"
-            }),
-          })
-          apiResult = await response.json()
-
-          if (apiResult.success && apiResult.image_description) {
-            setContent(apiResult.image_description)
-          }
-        } else {
-          alert("Unsupported file type")
-          setIsAnalyzing(false)
-          setBedrockStatus(null)
-          return
-        }
-
-        if (apiResult.success) {
-          setAnalysisResult({
-            ...apiResult,
-            bedrock_results: [{ type: "completion", data: { completionReason: "SUCCESS" } }],
-          })
-          setBedrockStatus("SUCCESS")
-          setActiveTab("result")
-        } else {
-          setBedrockStatus("FAILED")
-        }
-      } catch (error) {
-        console.error("API call failed:", error)
-        setBedrockStatus("FAILED")
-      } finally {
-        setIsAnalyzing(false)
+    if (file.type.startsWith("text/")) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setContent(e.target.result)
       }
+      reader.readAsText(file)
     }
-
-    // Read file as Data URL (Base64)
-    reader.readAsDataURL(file)
+    // For image/video, we just store the file object. Analysis will happen on button click.
   }
 
   const handleDragOver = (event) => {
@@ -127,77 +71,113 @@ export default function AIChecker() {
 
   const handleDrop = (event) => {
     event.preventDefault()
-    const files = event.dataTransfer.files
-    if (files.length > 0) {
-      const file = files[0]
-      setUploadedFile(file)
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setContent(e.target.result)
-      }
-      reader.readAsText(file)
-    }
+    // Reuse the file upload logic by creating a synthetic event
+    const syntheticEvent = { target: { files: event.dataTransfer.files } }
+    handleFileUpload(syntheticEvent)
   }
 
-  const mockAnalysis = async () => {
+  const handleAnalyzeContent = async () => {
+    if ((!content.trim() && !uploadedFile) || isAnalyzing || !targetRegion) {
+      if (!targetRegion) alert("Please select a target region.")
+      else alert("Please enter text or upload a file to analyze.")
+      return
+    }
     setIsAnalyzing(true)
     setProgress(0)
-    setActiveTab("result") // Changed to 'result' tab
-    setBedrockStatus("PROCESSING") // Set initial bedrock status
+    setActiveTab("result")
+    setBedrockStatus("PROCESSING")
+    setAnalysisResult(null)
 
-    // Simulate analysis progress
-    const steps = [
-      { progress: 20, message: "Analyzing content structure..." },
-      { progress: 40, message: "Checking cultural context..." },
-      { progress: 60, message: "Identifying localization challenges..." },
-      { progress: 80, message: "Generating recommendations..." },
-      { progress: 100, message: "Analysis complete!" },
-    ]
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => (prev < 90 ? prev + 10 : prev))
+    }, 500)
 
-    for (const step of steps) {
-      await new Promise((resolve) => setTimeout(resolve, 800))
-      setProgress(step.progress)
+    try {
+      let apiResult
+
+      // Map frontend region names to a country name that the Bedrock flow expects.
+      let countryForApi = targetRegion
+      if (targetRegion === "West Malaysia" || targetRegion === "East Malaysia") {
+        countryForApi = "Malaysia"
+      }
+
+      if (uploadedFile && (uploadedFile.type.startsWith("image/") || uploadedFile.type.startsWith("video/"))) {
+        // Handle Image or Video File
+        const file = uploadedFile
+        const base64Data = await new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.readAsDataURL(file)
+          reader.onload = () => resolve(reader.result)
+          reader.onerror = (error) => reject(error)
+        })
+
+        if (file.type.startsWith("video/")) {
+          const response = await fetch("http://127.0.0.1:8000/speech-to-text", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              video_base64: base64Data,
+              filename: file.name,
+              use_bedrock: true,
+              // Note: The video endpoint does not currently accept a country parameter.
+              // The analysis will use the backend's default.
+            }),
+          })
+          apiResult = await response.json()
+          if (apiResult.success) {
+            setContent(apiResult.text)
+            const analysis = apiResult.bedrock_analysis?.flow_outputs?.[0]?.content?.document
+            setAnalysisResult({ ...apiResult, analysis_result: analysis })
+          }
+        } else {
+          // Image
+          const response = await fetch("http://127.0.0.1:8000/image-analysis", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              image_base64: base64Data.split(",")[1],
+              image_format: file.type.split("/")[1],
+              country: countryForApi,
+            }),
+          })
+          apiResult = await response.json()
+          if (apiResult.success) {
+            setContent(apiResult.image_description)
+            setAnalysisResult(apiResult)
+          }
+        }
+      } else if (content.trim()) {
+        // Handle Text (from file or pasted)
+        const response = await fetch("http://127.0.0.1:8000/text-analysis", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text_content: content,
+            country: countryForApi,
+          }),
+        })
+        apiResult = await response.json()
+        if (apiResult.success) {
+          setAnalysisResult(apiResult)
+        }
+      } else {
+        throw new Error("No content to analyze.")
+      }
+
+      if (apiResult?.success) {
+        setBedrockStatus("SUCCESS")
+      } else {
+        setBedrockStatus("FAILED")
+        console.error("Analysis failed:", apiResult?.error || "Unknown error")
+      }
+    } catch (error) {
+      console.error("API call failed:", error)
+      setBedrockStatus("FAILED")
+    } finally {
+      clearInterval(progressInterval)
+      setProgress(100)
+      setIsAnalyzing(false)
     }
-
-    setAnalysisResult({
-      success: true,
-      analysis_result: {
-        relevancy: {
-          SCORE: 85,
-          relevancy_indicator: [
-            "Nasi Lemak",
-            "AI Makan Mode",
-            "sambal pop",
-            "Manglish",
-            "Confirm sedap gila!",
-            "Raya",
-            "Deepavali",
-            "wefies",
-            "Lagi power, lagi kita",
-            "modern kopitiam",
-          ],
-          explanation:
-            "The content is highly relevant to Malaysian audiences due to its incorporation of local language (Manglish), popular food (Nasi Lemak), cultural practices (festivals like Raya and Deepavali), and modern lifestyle elements (kopitiam, wefies). The humor and practical use of technology in daily life resonate well with Malaysians. The only minor deduction is for the fictional 'iPhone 17', which doesn't align with current market realities.",
-          RELEVANT: "Yes",
-          suggestion:
-            "To enhance cultural relevance further, consider including more specific local landmarks or current Malaysian issues. Additionally, showcasing the phone's capabilities in capturing local events or traditional practices could deepen the connection with the audience.",
-        },
-        appropriateness: {
-          RISK: "Low",
-          SCORE: 90,
-          explanation:
-            "The content is mostly culturally appropriate with a few minor issues. The use of 'Manglish' might be seen as informal and could be perceived as lacking professionalism. Mentioning 'Raya and Deepavali' is positive as it highlights cultural diversity but ensure other festivals are also represented to avoid perceptions of favoritism. These minor issues result in small penalties, leading to a high cultural appropriateness score.",
-          high_risk_indicator: ["Manglish", "Raya and Deepavali"],
-          suggestion:
-            "Consider using more formal language to maintain professionalism. Include references to other significant festivals in Malaysia to ensure balanced representation of cultural diversity.",
-        },
-      },
-      bedrock_results: [{ type: "completion", data: { completionReason: "SUCCESS" } }],
-      processing_time: 13.793892,
-    })
-
-    setBedrockStatus("SUCCESS") // Set final bedrock status
-    setIsAnalyzing(false)
   }
 
   const getSeverityColor = (severity) => {
@@ -406,7 +386,7 @@ export default function AIChecker() {
               {/* Analyze Button */}
               <div className="text-center">
                 <Button
-                  onClick={mockAnalysis}
+                  onClick={handleAnalyzeContent}
                   disabled={(!content.trim() && !uploadedFile) || isAnalyzing || !targetRegion}
                   size="lg"
                   className="px-8"
@@ -547,7 +527,7 @@ export default function AIChecker() {
                           <Progress value={analysisResult.analysis_result.relevancy.SCORE} className="w-full" />
 
                           <div className="space-y-2">
-                            <h4 className="font-medium">Relevancy Indicators:</h4>
+                            <h4 className="font-medium">Relevant Terms:</h4>
                             <div className="flex flex-wrap gap-2">
                               {analysisResult.analysis_result.relevancy.relevancy_indicator.map((indicator, index) => (
                                 <Badge key={index} variant="secondary" className="text-xs">
@@ -598,7 +578,7 @@ export default function AIChecker() {
 
                           {analysisResult.analysis_result.appropriateness.high_risk_indicator.length > 0 && (
                             <div className="space-y-2">
-                              <h4 className="font-medium text-red-600 dark:text-red-400">High Risk Indicators:</h4>
+                              <h4 className="font-medium text-red-600 dark:text-red-400">Potentially Sensitive Terms:</h4>
                               <div className="flex flex-wrap gap-2">
                                 {analysisResult.analysis_result.appropriateness.high_risk_indicator.map(
                                   (indicator, index) => (

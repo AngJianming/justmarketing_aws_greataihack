@@ -3,6 +3,7 @@ FastAPI Application for Video Speech-to-Text Processing
 Accepts base64-encoded video files and returns transcribed text
 """
 from fastapi import FastAPI, HTTPException, status, BackgroundTasks, UploadFile, Form
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import base64
