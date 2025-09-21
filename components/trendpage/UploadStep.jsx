@@ -85,30 +85,7 @@ export function UploadStep({
       </div>
 
       {/* Selected Trend Preview */}
-      {selectedVideo && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-primary rounded-full" />
-              Selected Trend Video
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-28 bg-muted rounded-lg flex items-center justify-center">
-                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                  <div className="w-0 h-0 border-l-[6px] border-l-primary border-y-[4px] border-y-transparent ml-1" />
-                </div>
-              </div>
-              <div>
-                <h4 className="font-medium text-foreground">Malaysian Food Challenge Trend</h4>
-                <p className="text-sm text-muted-foreground">2.3M views • 0:15 duration</p>
-                <p className="text-sm text-muted-foreground mt-1">This trend will be adapted with your content</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Video Upload */}
