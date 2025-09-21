@@ -1,21 +1,21 @@
 "use client"
 
-import { Download, RotateCcw, Share2, Play } from "lucide-react"
+import { Download, RotateCcw, Share2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-
 export function ResultStep({ selectedVideo, uploadedVideo, customizations, onStartOver }) {
+  // Download function for either uploaded video or placeholder
   const handleDownload = () => {
-    // Simulate download
     const link = document.createElement("a")
-    link.href = "/placeholder.mp4"
+    link.href = uploadedVideo ? URL.createObjectURL(uploadedVideo) : "/placeholder.mp4"
     link.download = "adapted-trend-video.mp4"
     link.click()
   }
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      {/* Header */}
       <div className="text-center">
         <h2 className="text-3xl font-bold text-foreground mb-4">Your Adapted Video is Ready!</h2>
         <p className="text-muted-foreground text-lg">
@@ -41,28 +41,24 @@ export function ResultStep({ selectedVideo, uploadedVideo, customizations, onSta
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="aspect-[9/16] max-w-sm mx-auto bg-muted rounded-lg flex items-center justify-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-accent/30" />
-            <div className="text-center z-10">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Play className="w-8 h-8 text-primary" />
-              </div>
-              <p className="text-foreground font-medium">Adapted Trend Video</p>
-              <p className="text-sm text-muted-foreground">Ready for download</p>
-            </div>
-            <div className="absolute bottom-4 right-4 bg-black/70 text-white text-xs px-2 py-1 rounded">0:30</div>
+          <div className="aspect-[9/16] max-w-sm mx-auto rounded-lg overflow-hidden relative bg-black">
+            <video
+              src={ "/finalvideo.mp4"}
+              controls
+              className="w-full h-full object-cover"
+            />
           </div>
         </CardContent>
       </Card>
 
-      {/* Summary */}
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Original Trend</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">Malaysian Food Challenge Trend</p>
+            <p className="text-sm text-muted-foreground">Malaysian Dancing Trend</p>
             <p className="text-xs text-muted-foreground mt-1">2.3M views • Viral format</p>
           </CardContent>
         </Card>
@@ -73,7 +69,9 @@ export function ResultStep({ selectedVideo, uploadedVideo, customizations, onSta
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">{uploadedVideo?.name || "Product video"}</p>
-            <p className="text-xs text-muted-foreground mt-1">{customizations.images.length} images • Custom prompts</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {customizations.images.length} images • Custom prompts
+            </p>
           </CardContent>
         </Card>
 
