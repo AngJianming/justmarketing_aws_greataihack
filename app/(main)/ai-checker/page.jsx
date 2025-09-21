@@ -50,18 +50,67 @@ export default function ContentLocalizerChecker() {
     'Malay', 'Chinese', 'Indian', 'Mixed'
   ];
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setUploadedFile(file);
-      // In a real app, you'd read the file content here
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setContent(e.target.result);
-      };
-      reader.readAsText(file);
+  // Add this function inside ContentLocalizerChecker component
+const handleFileUpload = async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  setUploadedFile(file);
+
+  // Read file as Base64
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64Data = e.target?.result;
+
+    try {
+      let response;
+
+      if (file.type.startsWith("video/")) {
+        // Call FastAPI Speech-to-Text
+        response = await fetch("http://127.0.0.1:8000/speech-to-text", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            video_base64: base64Data,
+            filename: file.name,
+          }),
+        });
+      } else if (file.type.startsWith("image/")) {
+        // Call FastAPI Image Analysis
+        response = await fetch("http://127.0.0.1:8000/image-analysis", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            image_base64: base64Data,
+            image_format: file.type.split("/")[1], // e.g., "jpeg", "png"
+          }),
+        });
+      } else {
+        alert("Unsupported file type");
+        return;
+      }
+
+      const result = await response.json();
+      console.log("API Result:", result);
+
+      // If it’s video, set transcribed text into content box
+      if (file.type.startsWith("video/") && result.success && result.text) {
+        setContent(result.text);
+      }
+
+      // If it’s image, set description into content box
+      if (file.type.startsWith("image/") && result.success && result.image_description) {
+        setContent(result.image_description);
+      }
+    } catch (error) {
+      console.error("API call failed:", error);
     }
   };
+
+  // Read file as Data URL (Base64)
+  reader.readAsDataURL(file);
+};
+
 
   const handleDragOver = (event) => {
     event.preventDefault();
