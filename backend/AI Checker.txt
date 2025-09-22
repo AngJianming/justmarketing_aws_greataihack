@@ -1,0 +1,62 @@
+🚀 Starting comprehensive API tests...
+
+==================================================
+TEST 1: API Connection
+==================================================
+🔍 Testing API connection...
+{'status': 'success', 'message': 'API is working correctly!'}
+
+==================================================
+TEST 2: Health Check
+==================================================
+🏥 Testing health check...
+{'status': 'healthy', 'timestamp': '2025-09-21T17:07:04.198346'}
+
+==================================================
+TEST 3: Text Analysis
+==================================================
+✅ test.txt found, using its content for text analysis.
+📝 Testing text analysis...
+Text to analyze: ### iPhone 17 Malaysia Ad Campaign - "Lagi Power, Lagi Kita"
+
+**Title:** The Nasi Lemak Test
+
+**Char...
+📤 Sending request to text analysis API...
+{'success': True, 'analysis_result': {'relevancy': {'SCORE': 85, 'relevancy_indicator': ['Nasi Lemak', 'AI Makan Mode', 'sambal pop', 'Manglish', 'Confirm sedap gila!', 'Raya', 'Deepavali', 'wefies', 'Lagi power, lagi kita', 'modern kopitiam'], 'explanation': "The content is highly relevant to Malaysian audiences due to its incorporation of local language (Manglish), popular food (Nasi Lemak), cultural practices (festivals like Raya and Deepavali), and modern lifestyle elements (kopitiam, wefies). The humor and practical use of technology in daily life resonate well with Malaysians. The only minor deduction is for the fictional 'iPhone 17', which doesn't align with current market realities.", 'RELEVANT': 'Yes', 'suggestion': "To enhance cultural relevance further, consider including more specific local landmarks or current Malaysian issues. Additionally, showcasing the phone's capabilities in capturing local events or traditional practices could deepen the connection with the audience."}, 'appropriateness': {'RISK': 'Low', 'SCORE': 90, 'explanation': "The content is mostly culturally appropriate with a few minor issues. The use of 'Manglish' might be seen as informal and could be perceived as lacking professionalism. Mentioning 'Raya and Deepavali' is positive as it highlights cultural diversity but ensure other festivals are also represented to avoid perceptions of favoritism. These minor issues result in small penalties, leading to a high cultural appropriateness score.", 'high_risk_indicator': ['Manglish', 'Raya and Deepavali'], 'suggestion': 'Consider using more formal language to maintain professionalism. Include references to other significant festivals in Malaysia to ensure balanced representation of cultural diversity.'}}, 'error': None, 'processing_time': 13.793892}
+
+==================================================
+TEST 4: Image Analysis (Optional)
+==================================================
+Looking for image file: test_image.jpg
+✅ Image file found, testing image analysis...
+🖼️  Testing image analysis with: test_image.jpg
+📤 Sending request to image analysis API...
+{'success': True, 'analysis_result': {'relevancy': {'SCORE': 90, 'relevancy_indicator': ['Gong Xi Fa Cai', 'Chinese New Year', 'red, a color associated with good luck and prosperity in Chinese culture', 'traditional Chinese lanterns', 'traditional Chinese New Year foods', 'people are wearing red clothing', 'Salam Lebaran Penuh Bermakna', 'Eid al-Fitr', 'family of four, including two adults and two children, dressed in traditional Islamic attire', 'the man is wearing a traditional baju kurung', 'the woman is wearing a hijab and a baju kurung'], 'explanation': "The image is highly relevant to Malaysian audiences as it celebrates two major cultural and religious festivals in Malaysia: Chinese New Year and Eid al-Fitr. The use of traditional colors, attire, and greetings in both posters emphasizes cultural respect and inclusivity. The presence of families in both posters highlights the importance of togetherness and shared joy during these festive seasons. The messaging promotes unity and the idea of finding goodness and meaning in celebrations, aligning with Malaysia's multicultural society.", 'RELEVANT': 'Yes', 'suggestion': "The image is already culturally relevant. To further enhance it, consider including elements from other major Malaysian festivals such as Deepavali or Hari Raya Aidiladha. Adding local landmarks or more diverse Malaysian cultural symbols could also enrich the campaign's representation of Malaysia's multicultural fabric."}, 'appropriateness': {'RISK': 'Low', 'SCORE': 95, 'explanation': "The image description contains no elements that are culturally sensitive, offensive, or inappropriate for a Malaysian audience. Both posters respect and celebrate major cultural and religious festivals in Malaysia—Chinese New Year and Eid al-Fitr—using appropriate traditional colors, attire, and greetings. The themes of togetherness, joy, and shared celebration align well with Malaysia's multicultural society. The use of QR codes for interactive engagement is also culturally neutral and appropriate.", 'high_risk_indicator': [], 'suggestion': 'No modifications are necessary as the content is already culturally appropriate for a Malaysian audience. Ensuring that future campaigns continue to respect and include diverse cultural and religious celebrations will maintain this standard.'}}, 'image_description': '', 'error': None, 'processing_time': 28.349489}
+
+==================================================
+TEST 5: Speech-to-Text (Optional)
+==================================================
+Looking for video file: test_video.mp4
+✅ Video file found, testing speech-to-text...
+
+--- Transcription with sBedrock Analysi Test ---
+🎥 Testing speech-to-text with: test_video.mp4
+🔍 Including Bedrock flow analysis
+📤 Sending request to API...
+{'success': True, 'text': "Guys, I experienced racism in Malaysia. Somebody called me Ajing. Yeah, and luckily I knew what it meant. I drink means dog, so. I think racism is still there in Malaysia. Like there's some people that are still racist. But then it's OK. It's fine. I'll just clip like a short footage of him saying Ajing. He said something before that, but then I don't know Malay, but then I captured the word anging. You can't make the plastic wet.", 'language_info': '🌍 Detected Language: en-US (confidence: 0.88)', 'bedrock_analysis': {'success': True, 'flow_outputs': [{'content': {'document': {'relevancy': {'SCORE': 70, 'relevancy_indicator': ['racism in Malaysia', 'Ajing', 'Malay', "it's OK. It's fine."], 'explanation': "The content is moderately relevant to Malaysian audiences due to its discussion of racism, a pertinent social issue in Malaysia. The use of the word 'Ajing', a racially charged term, directly references a local context and social sensitivity. However, the transcript lacks deeper cultural anchors such as local language usage beyond this term, references to Malaysian lifestyle, festivals, or current issues. The social context is acknowledged but not deeply explored, resulting in a moderate score.", 'RELEVANT': 'Yes', 'suggestion': 'To enhance cultural relevancy, the video could delve deeper into the social context of racism in Malaysia, perhaps by including local idioms, references to Malaysian festivals or social norms, and current issues affecting Malaysians. Incorporating local examples, such as specific incidents or community responses to racism, would provide a stronger cultural connection. Additionally, featuring local voices or experts on the topic could add authenticity and resonance for Malaysian viewers.'}, 'appropriateness': {'RISK': 'High', 'SCORE': 30, 'explanation': "The content includes a racial slur ('Ajing') and a discussion of racism in Malaysia, which falls under Ethnic/Racial Stereotypes and Hate Speech. The slur and the discussion of ongoing racism received severe penalties due to their direct and explicit nature. Additionally, the phrase 'I drink means dog' is confusing and potentially offensive, contributing to the low score. The content risks significant offense and social harm, leading to a High risk rating.", 'high_risk_indicator': ['Ajing', 'I drink means dog', 'racism is still there in Malaysia', 'some people that are still racist', "can't make the plastic wet"], 'suggestion': 'Remove or rephrase the racial slur and any direct references to racism to avoid offense. Clarify any cultural misunderstandings with accurate information and context. Consider framing the discussion in a more educational or critical manner, focusing on promoting understanding and respect. These changes will help make the video more culturally appropriate for a Malaysian audience.'}}}, 'nodeName': 'FlowOutputNode'}], 'bedrock_results': [{'type': 'completion', 'data': {'completionReason': 'SUCCESS'}}], 'input_document': {'content': "Guys, I experienced racism in Malaysia. Somebody called me Ajing. Yeah, and luckily I knew what it meant. I drink means dog, so. I think racism is still there in Malaysia. Like there's some people that are still racist. But then it's OK. It's fine. I'll just clip like a short footage of him saying Ajing. He said something before that, but then I don't know Malay, but then I captured the word anging. You can't make the plastic wet.", 'country': 'Malaysia', 'file_type': 'video'}}, 'error': None, 'processing_time': 32.608677}
+✅ Bedrock analysis test passed!
+
+======================================================================
+🎉 API TESTING COMPLETED!
+======================================================================
+Summary:
+✅ Connection test - Always runs
+✅ Health check - Always runs
+✅ Text analysis - Always runs
+⚠️  Image analysis - Requires test image file
+⚠️  Speech-to-text - Requires test video file
+
+To test all endpoints, make sure you have:
+- test_image.jpg (for image analysis)
+- test_video.mp4 (for speech-to-text)

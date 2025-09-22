@@ -62,37 +62,78 @@
 
 ```
 justmarketing_aws_greathack/
-├── app/                          # Next.js App Router
-│   ├── layout.tsx               # Root layout component
-│   ├── page.tsx                 # Home page
-│   └── globals.css              # Global styles
-├── components/                   # React components
-│   ├── ai-checker.tsx           # Main AI checker component
-│   └── ui/                      # Shadcn/ui components
-│       ├── button.tsx
-│       ├── card.tsx
-│       ├── badge.tsx
-│       ├── progress.tsx
-│       ├── alert.tsx
-│       ├── textarea.tsx
-│       └── label.tsx
-├── lib/                         # Utility functions
-│   └── utils.ts                 # Common utilities
-├── hooks/                       # Custom React hooks
-│   ├── use-mobile.tsx
-│   └── use-toast.ts
-├── public/                      # Static assets
-│   └── tech-architecture.png    # System architecture diagram
-├── backend/                     # FastAPI backend (separate repo)
-│   ├── main.py                  # FastAPI application
-│   ├── routers/                 # API route handlers
-│   ├── services/                # Business logic
-│   └── models/                  # Data models
-├── docs/                        # Documentation
-├── README.md                    # This file
-├── package.json                 # Dependencies
-├── next.config.mjs             # Next.js configuration
-└── tsconfig.json               # TypeScript configuration
+├── app/                           # Next.js application (frontend pages & routes)            
+│   ├── (main)/                     # Main route group                                        
+│   ├── favicon.ico                  # Website favicon                                        
+│   ├── globals.css                  # Global CSS styles                                      
+│   ├── layout.js                    # Root layout component                                  
+│   ├── page.js                      # Default landing page                                   
+│   └── sign-in/                     # Authentication pages (sign in, etc.)                   
+│
+├── backend/                       # Python backend (API, AI services, scripts)              
+│   ├── AI Checker.txt               # Notes on AI checker logic                              
+│   ├── Analysis/                    # Analysis-related files                                 
+│   ├── Docs/                        # Backend documentation                                 
+│   ├── FLEX.pdf                     # Reference PDF (FLEX)                                   
+│   ├── FlexCompany.pdf              # Reference PDF (Company)                                
+│   ├── Images/                      # Images for backend testing                            
+│   ├── README.md                    # Backend-specific documentation                        
+│   ├── pycache/                     # Python cache files                                    
+│   ├── app.py                       # Main backend app (Flask/FastAPI)                      
+│   ├── bedrock.py                   # AWS Bedrock integration                               
+│   ├── bedrockClient.py             # AWS Bedrock client utilities                          
+│   ├── image_checker.py             # Image moderation/validation logic                     
+│   ├── requirements.txt             # Python dependencies                                   
+│   ├── speech_to_text.py            # Video/Audio transcription logic                       
+│   ├── test.txt                     # Test input file                                       
+│   ├── test_api.py                  # API test script                                       
+│   ├── test_image.jpg               # Sample test image                                     
+│   ├── test_image1.jpg              # Another sample test image                             
+│   ├── test_video.mp4               # Sample test video                                     
+│   ├── text_checker.py              # Text moderation/checker                               
+│   └── venv/                        # Virtual environment                                   
+│
+├── components/                     # Reusable React components                             
+│   ├── Footer.jsx                   # Website footer                                        
+│   ├── Header.jsx                   # Website header                                        
+│   ├── dashboardpage/               # Dashboard UI components                               
+│   ├── landingpage/                 # Landing page UI components                            
+│   ├── strategypage/                # Strategy page UI components                           
+│   ├── translatepage/               # Translation page UI components                        
+│   ├── trendpage/                   # Trend analysis UI components                          
+│   └── ui/                          # Shared UI elements (buttons, modals, etc.)            
+│
+├── lib/                            # Utility functions                                     
+│   └── utils.js                     # Shared helper functions                               
+│
+├── public/                         # Static assets (served directly by Next.js)            
+│   ├── element_1.png                                                                        
+│   ├── element_1_nobg.png                                                                    
+│   ├── element_2.png                                                                        
+│   ├── element_2_nobg.png                                                                    
+│   ├── element_3.png                                                                        
+│   ├── element_3_nobg.png                                                                    
+│   ├── element_4.png                                                                        
+│   ├── element_4_nobg.png                                                                    
+│   ├── element_5.png                                                                        
+│   ├── element_5_nobg.png                                                                    
+│   ├── file.svg                                                                             
+│   ├── finalvideo.mp4                                                                       
+│   ├── globe.svg                                                                            
+│   ├── next.svg                                                                             
+│   ├── vercel.svg                                                                           
+│   └── window.svg                                                                           
+│
+├── .gitignore                      # Git ignore rules                                      
+├── README.md                       # Project documentation                                 
+├── components.json                 # Component library config (shadcn/ui, etc.)            
+├── eslint.config.mjs               # ESLint configuration                                  
+├── jsconfig.json                   # JavaScript/Next.js path settings                      
+├── next.config.mjs                  # Next.js project configuration                         
+├── package-lock.json               # Dependency lock file                                  
+├── package.json                    # Project dependencies & scripts                        
+└── postcss.config.mjs              # PostCSS configuration                                 
+
 ```
 
 ## 🚀 Getting Started
