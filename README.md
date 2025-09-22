@@ -50,13 +50,20 @@
 
 ### Infrastructure
 - **AWS Services** - Cloud infrastructure and AI services
-- **Vercel** - Frontend deployment and hosting
+   - **AWS Elastic Beanstalk** - Deploy Web Applications
+   - **AWS Lambda** - Serverless compute service that allows running code without managing servers
+   - **Amazon S3 (Simple Storage Service)** - S3 object storage service
 - **RESTful APIs** - Clean API architecture
 
 ### Development Tools
 - **ESLint** - Code linting and quality
 - **Prettier** - Code formatting
 - **Git** - Version control
+
+## 🏛️ System Architecture
+
+![Tech Architecture](/Architecture.jpg)
+
 
 ## 📁 Project Structure
 
@@ -203,6 +210,4 @@ justmarketing_aws_greathack/
    uvicorn main:app --reload --host 127.0.0.1 --port 8000
    \`\`\`
 
-## 🏛️ System Architecture
 
-![Tech Architecture](./public/tech-architecture.jpg)
