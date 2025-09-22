@@ -1,4 +1,4 @@
-# JustMarketing AWS GreatHack 🚀
+# JustMarketing AWS GreatAIHack 🚀
 
 > AI-powered marketing content localization and cultural adaptation platform for the Malaysian market
 
